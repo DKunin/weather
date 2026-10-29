@@ -49,6 +49,7 @@ export function buildWeatherUrl(latitude, longitude) {
       'wind_direction_10m',
       'is_day',
     ].join(','),
+    hourly: 'temperature_2m',
     daily: [
       'weather_code',
       'temperature_2m_max',
@@ -104,4 +105,3 @@ export function requestJson(url, { proxyUrl, timeoutMs = 15_000 } = {}) {
     request.on('error', reject)
   })
 }
-

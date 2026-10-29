@@ -1,5 +1,6 @@
 import { Droplets, Sun, Wind } from 'lucide-react'
 import { temperature, windSpeed } from '../lib/format'
+import { getTodayDayparts } from '../lib/dayparts'
 import type { Forecast, UnitSystem } from '../lib/types'
 import { weatherIcon, weatherLabel } from '../lib/weather'
 
@@ -10,6 +11,7 @@ type CurrentWeatherProps = {
 
 export function CurrentWeather({ forecast, units }: CurrentWeatherProps) {
   const { current, daily } = forecast
+  const dayparts = getTodayDayparts(forecast)
   const metrics = [
     {
       label: 'Precipitation',
@@ -48,7 +50,15 @@ export function CurrentWeather({ forecast, units }: CurrentWeatherProps) {
           </div>
         ))}
       </div>
+      <div className="dayparts" aria-label="Today's temperatures by time of day">
+        {dayparts.map(({ label, time, temperature: value }) => (
+          <div className="daypart" key={label}>
+            <span>{label}</span>
+            <strong>{value === null ? '—' : temperature(value, units)}</strong>
+            <small>{time}</small>
+          </div>
+        ))}
+      </div>
     </section>
   )
 }
-

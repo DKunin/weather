@@ -1,4 +1,4 @@
-import { ChevronDown, MapPin, RefreshCw, Star } from 'lucide-react'
+import { ChevronDown, MapPin, Moon, RefreshCw, Star, Sun } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CurrentWeather } from './components/CurrentWeather'
 import { ThreeDayForecast, WeekForecast } from './components/Forecasts'
@@ -29,10 +29,17 @@ function readStoredUnits(): UnitSystem {
   return localStorage.getItem('weather:units') === 'imperial' ? 'imperial' : 'metric'
 }
 
+function readStoredTheme(): 'light' | 'dark' {
+  const stored = localStorage.getItem('weather:theme')
+  if (stored === 'light' || stored === 'dark') return stored
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
 export default function App() {
   const [place, setPlace] = useState<Place>(readStoredPlace)
   const [savedPlace, setSavedPlace] = useState<Place>(readStoredPlace)
   const [units, setUnits] = useState<UnitSystem>(readStoredUnits)
+  const [theme, setTheme] = useState<'light' | 'dark'>(readStoredTheme)
   const [forecast, setForecast] = useState<Forecast | null>(null)
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
   const [clock, setClock] = useState(0)
@@ -73,6 +80,11 @@ export default function App() {
     return () => window.clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('weather:theme', theme)
+  }, [theme])
+
   const isSaved = useMemo(() => place.id === savedPlace.id, [place.id, savedPlace.id])
   const updatedLabel = updatedAt ? relativeUpdate(updatedAt) : 'Updating weather…'
   void clock
@@ -106,6 +118,15 @@ export default function App() {
             <button className={units === 'metric' ? 'active' : ''} onClick={() => changeUnits('metric')} type="button">°C</button>
             <button className={units === 'imperial' ? 'active' : ''} onClick={() => changeUnits('imperial')} type="button">°F</button>
           </div>
+          <button
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            className="theme-toggle"
+            onClick={() => setTheme((value) => value === 'light' ? 'dark' : 'light')}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            type="button"
+          >
+            {theme === 'light' ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}
+          </button>
           <button className="refresh" onClick={() => void loadForecast(place)} type="button">
             <RefreshCw aria-hidden="true" />
             <span>{updatedLabel}</span>
@@ -146,4 +167,3 @@ export default function App() {
     </main>
   )
 }
-

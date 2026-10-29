@@ -24,6 +24,11 @@ export type Forecast = {
     is_day: number
   }
   current_units: Record<string, string>
+  hourly: {
+    time: string[]
+    temperature_2m: number[]
+  }
+  hourly_units: Record<string, string>
   daily: {
     time: string[]
     weather_code: number[]
@@ -39,4 +44,3 @@ export type Forecast = {
 }
 
 export type UnitSystem = 'metric' | 'imperial'
-
