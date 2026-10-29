@@ -118,10 +118,11 @@ app.get('/api/weather', async (req, res) => {
 
 app.use(express.static(distDir, {
   etag: true,
-  maxAge: '1h',
   setHeaders(res, filePath) {
     if (filePath.includes(`${path.sep}assets${path.sep}`)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+    } else if (path.basename(filePath) === 'index.html') {
+      res.setHeader('Cache-Control', 'no-cache')
     }
   },
 }))
@@ -131,6 +132,7 @@ app.use((req, res, next) => {
     next()
     return
   }
+  res.setHeader('Cache-Control', 'no-cache')
   res.sendFile(path.join(distDir, 'index.html'))
 })
 
