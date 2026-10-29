@@ -10,7 +10,8 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       PORT: 4175,
+      APP_VERSION: process.env.APP_VERSION,
+      WEATHER_SOCKS_PROXY: process.env.WEATHER_SOCKS_PROXY,
     },
   }],
 }
-
