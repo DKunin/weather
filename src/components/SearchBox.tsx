@@ -1,5 +1,6 @@
-import { Search } from 'lucide-react'
+import { Clock3, Search } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { readRecentPlaces, withRecentPlace, writeRecentPlaces } from '../lib/recents'
 import type { Place } from '../lib/types'
 
 type SearchBoxProps = {
@@ -9,6 +10,7 @@ type SearchBoxProps = {
 export function SearchBox({ onSelect }: SearchBoxProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Place[]>([])
+  const [recentPlaces, setRecentPlaces] = useState<Place[]>(() => readRecentPlaces(localStorage))
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -48,43 +50,53 @@ export function SearchBox({ onSelect }: SearchBoxProps) {
     return () => document.removeEventListener('pointerdown', close)
   }, [])
 
+  const selectPlace = (place: Place) => {
+    const nextRecentPlaces = withRecentPlace(recentPlaces, place)
+    setRecentPlaces(nextRecentPlaces)
+    writeRecentPlaces(localStorage, nextRecentPlaces)
+    onSelect(place)
+    setQuery('')
+    setOpen(false)
+  }
+
+  const showRecents = open && query.trim().length === 0 && recentPlaces.length > 0
+  const showResults = open && query.trim().length >= 2 && results.length > 0
+
   return (
     <div className="search-box" ref={rootRef}>
       <Search aria-hidden="true" size={20} />
       <input
         aria-autocomplete="list"
         aria-controls="city-results"
-        aria-expanded={open}
+        aria-expanded={showRecents || showResults}
         aria-label="Search city"
         autoComplete="off"
         onChange={(event) => setQuery(event.target.value)}
-        onFocus={() => results.length > 0 && setOpen(true)}
+        onFocus={() => (recentPlaces.length > 0 || results.length > 0) && setOpen(true)}
         placeholder="Search city…"
         role="combobox"
         value={query}
       />
       {busy && <span className="search-busy" aria-label="Searching" />}
-      {open && results.length > 0 && (
-        <ul className="search-results" id="city-results" role="listbox">
-          {results.map((place) => (
-            <li key={place.id}>
-              <button
-                onClick={() => {
-                  onSelect(place)
-                  setQuery('')
-                  setOpen(false)
-                }}
-                role="option"
-                type="button"
-              >
-                <strong>{place.name}</strong>
-                <span>{[place.admin1, place.country].filter(Boolean).join(', ')}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      {(showRecents || showResults) && (
+        <div className="search-menu">
+          {showRecents && <div className="search-menu-label"><Clock3 aria-hidden="true" />Recent cities</div>}
+          <ul className="search-results" id="city-results" role="listbox" aria-label={showRecents ? 'Recent cities' : 'City results'}>
+            {(showRecents ? recentPlaces : results).map((place) => (
+              <li key={place.id}>
+                <button
+                  onClick={() => selectPlace(place)}
+                  role="option"
+                  type="button"
+                >
+                  <strong>{place.name}</strong>
+                  <span>{[place.admin1, place.country].filter(Boolean).join(', ')}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )
 }
-

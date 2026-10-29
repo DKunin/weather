@@ -77,7 +77,10 @@ button { color: inherit; }
 .search-box input::placeholder { color: #7890a8; }
 .search-box input:focus { border-color: #84b6e7; background: #fff; box-shadow: 0 0 0 4px rgba(38, 112, 187, 0.11); }
 .search-busy { position: absolute; right: 15px; top: 16px; width: 14px; height: 14px; border: 2px solid #d1dfeb; border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; }
-.search-results { position: absolute; z-index: 20; top: calc(100% + 8px); width: 100%; min-width: 320px; margin: 0; padding: 7px; list-style: none; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 18px 42px rgba(29, 63, 96, 0.18); }
+.search-menu { position: absolute; z-index: 20; top: calc(100% + 8px); width: 100%; min-width: 320px; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 18px 42px rgba(29, 63, 96, 0.18); }
+.search-menu-label { display: flex; align-items: center; gap: 8px; padding: 10px 12px 6px; color: #647b93; font-size: 12px; font-weight: 750; letter-spacing: 0.02em; }
+.search-menu-label svg { width: 15px; height: 15px; }
+.search-results { margin: 0; padding: 4px 7px 7px; list-style: none; }
 .search-results button { display: flex; width: 100%; flex-direction: column; align-items: flex-start; gap: 3px; padding: 10px 12px; border: 0; border-radius: 10px; background: transparent; cursor: pointer; text-align: left; }
 .search-results button:hover, .search-results button:focus-visible { background: #edf6fc; outline: none; }
 .search-results span { color: var(--muted); font-size: 13px; }
@@ -119,12 +122,16 @@ button { color: inherit; }
   align-items: center;
   overflow: hidden;
   border-radius: var(--radius);
-  background: #dceeff url('/sky-clouds.jpg') center / cover no-repeat;
+  background: #dceeff;
+  transform: perspective(1200px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease;
 }
+.current-card::before { content: ''; position: absolute; inset: -14px; z-index: -2; background: url('/sky-clouds.jpg') center / cover no-repeat; transform: translate3d(var(--sky-x, 0), var(--sky-y, 0), 0) scale(1.045); transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .current-card::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(227, 243, 255, 0.1), rgba(235, 247, 255, 0.43) 62%, rgba(228, 243, 255, 0.72)); }
-.current-icon-wrap { display: grid; place-items: center; padding: 16px; }
+.current-icon-wrap { display: grid; place-items: center; padding: 16px; transform: translate3d(var(--foreground-x, 0), var(--foreground-y, 0), 18px); transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .current-icon { width: min(260px, 95%); filter: drop-shadow(0 15px 18px rgba(39, 82, 117, 0.12)); }
-.current-summary { padding: 20px 30px; }
+.current-summary { padding: 20px 30px; transform: translate3d(var(--foreground-x, 0), var(--foreground-y, 0), 10px); transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .current-temperature { font-size: clamp(72px, 8vw, 118px); line-height: 0.88; font-weight: 760; letter-spacing: -0.075em; }
 .feels-like { margin-top: 22px; color: #405975; font-size: 24px; }
 .current-summary h1 { margin: 8px 0; font-size: 29px; line-height: 1.1; letter-spacing: -0.025em; }
@@ -156,7 +163,12 @@ button { color: inherit; }
 .forecast-main div { display: flex; flex-direction: column; gap: 3px; }
 .forecast-main strong { font-size: 36px; letter-spacing: -0.04em; }
 .forecast-main span { color: var(--muted); font-size: 22px; }
-.forecast-meta { display: flex; justify-content: space-around; gap: 14px; padding-top: 13px; border-top: 1px solid #e3ebf2; color: #334d6d; }
+.forecast-dayparts { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 -7px 14px; padding: 10px 0; border-block: 1px solid #e3ebf2; }
+.forecast-dayparts span { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 3px; border-left: 1px solid #e3ebf2; }
+.forecast-dayparts span:first-child { border-left: 0; }
+.forecast-dayparts small { color: #61778f; font-size: 10px; font-weight: 650; }
+.forecast-dayparts strong { font-size: 17px; }
+.forecast-meta { display: flex; justify-content: space-around; gap: 14px; color: #334d6d; }
 .forecast-meta span, .week-rain { display: inline-flex; align-items: center; gap: 8px; }
 .forecast-meta svg, .week-rain svg { width: 18px; color: #1573d4; fill: rgba(21, 115, 212, 0.13); }
 
@@ -234,6 +246,9 @@ footer a { color: inherit; }
   .forecast-main div { flex-direction: row; align-items: baseline; gap: 10px; }
   .forecast-main strong { font-size: 20px; }
   .forecast-main span { font-size: 15px; }
+  .forecast-dayparts { grid-column: 1 / -1; grid-row: 2; margin: 0; padding: 8px 0 4px; border-top: 1px solid #e3ebf2; border-bottom: 0; }
+  .forecast-dayparts small { font-size: 9px; }
+  .forecast-dayparts strong { font-size: 15px; }
   .forecast-meta { flex-direction: column; gap: 3px; padding: 0; border: 0; font-size: 12px; }
   .forecast-meta span { gap: 5px; }
   .forecast-meta svg { width: 14px; height: 14px; }
@@ -253,6 +268,7 @@ footer a { color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .current-card, .current-card::before, .current-icon-wrap, .current-summary { transform: none !important; }
 }
 
 html[data-theme='dark'] {
@@ -292,7 +308,7 @@ html[data-theme='dark'] .search-box input:focus {
   box-shadow: 0 0 0 4px rgba(76, 157, 240, 0.14);
 }
 
-html[data-theme='dark'] .search-results,
+html[data-theme='dark'] .search-menu,
 html[data-theme='dark'] .saved-place,
 html[data-theme='dark'] .theme-toggle,
 html[data-theme='dark'] .week-toggle,
@@ -312,6 +328,7 @@ html[data-theme='dark'] .week-toggle:hover {
 }
 
 html[data-theme='dark'] .search-results span,
+html[data-theme='dark'] .search-menu-label,
 html[data-theme='dark'] .refresh,
 html[data-theme='dark'] footer,
 html[data-theme='dark'] footer a {
@@ -323,10 +340,10 @@ html[data-theme='dark'] .unit-toggle button.active { color: #061528; background:
 
 html[data-theme='dark'] .current-card {
   color: #eff8ff;
-  background:
-    linear-gradient(90deg, rgba(8, 30, 53, 0.64), rgba(12, 42, 70, 0.76)),
-    url('/sky-clouds.jpg') center / cover no-repeat;
+  background: #102b45;
 }
+
+html[data-theme='dark'] .current-card::before { filter: brightness(0.52) saturate(0.78) contrast(1.08); }
 
 html[data-theme='dark'] .current-card::after {
   background: linear-gradient(90deg, rgba(8, 26, 47, 0.06), rgba(5, 20, 38, 0.28) 60%, rgba(5, 20, 38, 0.5));
@@ -341,6 +358,8 @@ html[data-theme='dark'] .metric span {
 html[data-theme='dark'] .current-metrics,
 html[data-theme='dark'] .dayparts,
 html[data-theme='dark'] .daypart,
+html[data-theme='dark'] .forecast-dayparts,
+html[data-theme='dark'] .forecast-dayparts span,
 html[data-theme='dark'] .forecast-meta,
 html[data-theme='dark'] .week-day {
   border-color: rgba(168, 198, 222, 0.22);
@@ -354,6 +373,7 @@ html[data-theme='dark'] .daypart span { color: #c4d7e8; }
 html[data-theme='dark'] .daypart small { color: #91a8bc; }
 
 html[data-theme='dark'] .forecast-main span,
+html[data-theme='dark'] .forecast-dayparts small,
 html[data-theme='dark'] .week-temperatures span,
 html[data-theme='dark'] .week-day h3 {
   color: #a8bacd;

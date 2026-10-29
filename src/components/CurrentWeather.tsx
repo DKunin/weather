@@ -1,4 +1,6 @@
 import { Droplets, Sun, Wind } from 'lucide-react'
+import { useRef } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 import { temperature, windSpeed } from '../lib/format'
 import { getTodayDayparts } from '../lib/dayparts'
 import type { Forecast, UnitSystem } from '../lib/types'
@@ -10,6 +12,7 @@ type CurrentWeatherProps = {
 }
 
 export function CurrentWeather({ forecast, units }: CurrentWeatherProps) {
+  const cardRef = useRef<HTMLElement>(null)
   const { current, daily } = forecast
   const dayparts = getTodayDayparts(forecast)
   const metrics = [
@@ -23,8 +26,39 @@ export function CurrentWeather({ forecast, units }: CurrentWeatherProps) {
     { label: 'UV', value: `${Math.round(daily.uv_index_max[0] ?? 0)}`, icon: Sun },
   ]
 
+  const resetParallax = () => {
+    const card = cardRef.current
+    if (!card) return
+    for (const property of ['--sky-x', '--sky-y', '--foreground-x', '--foreground-y', '--tilt-x', '--tilt-y']) {
+      card.style.removeProperty(property)
+    }
+  }
+
+  const updateParallax = (event: ReactPointerEvent<HTMLElement>) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
+
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5
+    const card = event.currentTarget
+    card.style.setProperty('--sky-x', `${x * 12}px`)
+    card.style.setProperty('--sky-y', `${y * 8}px`)
+    card.style.setProperty('--foreground-x', `${x * -5}px`)
+    card.style.setProperty('--foreground-y', `${y * -4}px`)
+    card.style.setProperty('--tilt-x', `${y * -1.1}deg`)
+    card.style.setProperty('--tilt-y', `${x * 1.1}deg`)
+  }
+
   return (
-    <section className="current-card" aria-labelledby="current-condition">
+    <section
+      className="current-card"
+      aria-labelledby="current-condition"
+      onPointerCancel={resetParallax}
+      onPointerLeave={resetParallax}
+      onPointerMove={updateParallax}
+      ref={cardRef}
+    >
       <div className="current-icon-wrap">
         <img
           alt=""

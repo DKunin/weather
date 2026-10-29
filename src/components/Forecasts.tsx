@@ -1,4 +1,5 @@
 import { Droplets, Wind } from 'lucide-react'
+import { getForecastDayparts } from '../lib/dayparts'
 import { dayName, temperature, windSpeed } from '../lib/format'
 import type { Forecast, UnitSystem } from '../lib/types'
 import { weatherIcon, weatherLabel } from '../lib/weather'
@@ -11,8 +12,9 @@ type ForecastsProps = {
 export function ThreeDayForecast({ forecast, units }: ForecastsProps) {
   return (
     <div className="three-day-grid">
-      {forecast.daily.time.slice(0, 3).map((date, index) => (
-        <article className="forecast-card" key={date}>
+      {forecast.daily.time.slice(0, 3).map((date, index) => {
+        const dayparts = getForecastDayparts(forecast, date)
+        return <article className="forecast-card" key={date}>
           <h3>{dayName(date)}</h3>
           <div className="forecast-main">
             <img alt={weatherLabel(forecast.daily.weather_code[index])} src={weatherIcon(forecast.daily.weather_code[index])} />
@@ -21,12 +23,20 @@ export function ThreeDayForecast({ forecast, units }: ForecastsProps) {
               <span>{temperature(forecast.daily.temperature_2m_min[index], units)}</span>
             </div>
           </div>
+          <div className="forecast-dayparts" aria-label={`${dayName(date, true)} temperatures by time of day`}>
+            {dayparts.map(({ label, temperature: value }) => (
+              <span key={label}>
+                <small>{label}</small>
+                <strong>{value === null ? '—' : temperature(value, units)}</strong>
+              </span>
+            ))}
+          </div>
           <div className="forecast-meta">
             <span><Droplets aria-hidden="true" />{forecast.daily.precipitation_probability_max[index] ?? 0}%</span>
             <span><Wind aria-hidden="true" />{windSpeed(forecast.daily.wind_speed_10m_max[index], units)}</span>
           </div>
         </article>
-      ))}
+      })}
     </div>
   )
 }
@@ -51,4 +61,3 @@ export function WeekForecast({ forecast, units }: ForecastsProps) {
     </section>
   )
 }
-
