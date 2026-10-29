@@ -28,10 +28,12 @@ set -a
 source "${ENV_FILE}"
 set +a
 : "${WEATHER_SOCKS_PROXY:?WEATHER_SOCKS_PROXY must not be empty}"
+umask 022
 
 git pull --ff-only origin main
 "${NPM_BIN}" ci --no-audit --no-fund
 "${NPM_BIN}" run check
+chmod -R u=rwX,go=rX "${APP_DIR}/dist"
 
 APP_VERSION="$(git rev-parse HEAD)"
 export APP_VERSION
@@ -49,4 +51,3 @@ done
 
 echo "Weather did not report revision ${APP_VERSION} with its proxy configured." >&2
 exit 1
-
