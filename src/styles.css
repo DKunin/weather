@@ -20,6 +20,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.96), transparent 28rem),
     linear-gradient(145deg, #f8fbfd 0%, #e8f4fb 100%);
@@ -112,6 +113,7 @@ button { color: inherit; }
 .refresh { padding: 0 3px; border: 0; color: #5c718c; background: transparent; font-size: 13px; font-weight: 560; }
 .refresh { justify-self: end; }
 .refresh svg { width: 18px; }
+.refresh svg.is-loading { animation: spin 0.9s linear infinite; }
 
 .current-card {
   position: relative;
@@ -207,7 +209,13 @@ footer a { color: inherit; }
 
 @media (max-width: 720px) {
   .page-shell { padding: 0; }
-  .weather-app { min-height: 100vh; padding: 18px 16px 14px; border: 0; border-radius: 0; }
+  .weather-app {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    border: 0;
+    border-radius: 0;
+  }
   .topbar { grid-template-columns: 1fr auto auto; gap: 10px; margin-bottom: 12px; }
   .place-title { font-size: 25px; }
   .search-box { grid-column: 1 / -1; grid-row: 2; }

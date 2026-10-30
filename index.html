@@ -2,14 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f4f9fd" />
     <meta name="description" content="Current weather and a focused seven-day forecast for your saved city." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Weather" />
+    <link rel="icon" href="/pwa-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Weather</title>
+    <style>
+      body{margin:0;min-width:320px;min-height:100vh;background:#eef7fc}.boot-skeleton{box-sizing:border-box;width:min(1180px,calc(100% - 56px));margin:48px auto;padding:22px;border:1px solid #d8e5ef;border-radius:24px;background:#fff}.boot-skeleton__bar{height:46px;margin-bottom:18px;border-radius:16px}.boot-skeleton__hero{height:372px;border-radius:20px}.boot-skeleton__cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:62px}.boot-skeleton__cards span{height:190px;border-radius:16px}.boot-skeleton__bar,.boot-skeleton__hero,.boot-skeleton__cards span{display:block;background:linear-gradient(110deg,#edf4f8 20%,#f8fbfd 42%,#edf4f8 64%);background-size:220% 100%;animation:boot-shimmer 1.3s linear infinite}@keyframes boot-shimmer{to{background-position-x:-220%}}@media(max-width:720px){.boot-skeleton{width:100%;min-height:100vh;min-height:100dvh;margin:0;padding:18px 16px;border:0;border-radius:0}.boot-skeleton__bar{height:114px}.boot-skeleton__hero{height:430px}.boot-skeleton__cards{grid-template-columns:1fr;gap:9px;margin-top:58px}.boot-skeleton__cards span{height:88px}}@media(prefers-color-scheme:dark){body{background:#07111f}.boot-skeleton{border-color:#2b4054;background:#0d1b2b}.boot-skeleton__bar,.boot-skeleton__hero,.boot-skeleton__cards span{background:linear-gradient(110deg,#102236 20%,#193149 42%,#102236 64%);background-size:220% 100%}}@media(prefers-reduced-motion:reduce){.boot-skeleton__bar,.boot-skeleton__hero,.boot-skeleton__cards span{animation:none}}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-skeleton" role="status" aria-label="Loading weather">
+        <span class="boot-skeleton__bar"></span>
+        <span class="boot-skeleton__hero"></span>
+        <div class="boot-skeleton__cards"><span></span><span></span><span></span></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

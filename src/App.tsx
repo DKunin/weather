@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CurrentWeather } from './components/CurrentWeather'
 import { ThreeDayForecast, WeekForecast } from './components/Forecasts'
 import { SearchBox } from './components/SearchBox'
+import { readCachedForecast, writeCachedForecast } from './lib/forecastCache'
 import { relativeUpdate } from './lib/format'
 import type { Forecast, Place, UnitSystem } from './lib/types'
 
@@ -38,16 +39,19 @@ function readStoredTheme(): 'light' | 'dark' {
 export default function App() {
   const [place, setPlace] = useState<Place>(readStoredPlace)
   const [savedPlace, setSavedPlace] = useState<Place>(readStoredPlace)
+  const [initialCache] = useState(() => readCachedForecast(place))
   const [units, setUnits] = useState<UnitSystem>(readStoredUnits)
   const [theme, setTheme] = useState<'light' | 'dark'>(readStoredTheme)
-  const [forecast, setForecast] = useState<Forecast | null>(null)
-  const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
+  const [forecast, setForecast] = useState<Forecast | null>(initialCache?.forecast ?? null)
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(() => initialCache ? new Date(initialCache.savedAt) : null)
+  const [isCached, setIsCached] = useState(Boolean(initialCache))
   const [clock, setClock] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showWeek, setShowWeek] = useState(() => window.matchMedia('(min-width: 760px)').matches)
 
   const loadForecast = useCallback(async (target: Place, signal?: AbortSignal) => {
+    const requestedAt = Date.now()
     setLoading(true)
     setError('')
     try {
@@ -58,8 +62,12 @@ export default function App() {
       const response = await fetch(`/api/weather?${params}`, { signal })
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error || 'Weather is unavailable right now.')
+      const responseDate = Date.parse(response.headers.get('date') || '')
+      const savedAt = Number.isFinite(responseDate) ? Math.min(responseDate, Date.now()) : Date.now()
       setForecast(payload as Forecast)
-      setUpdatedAt(new Date())
+      setUpdatedAt(new Date(savedAt))
+      setIsCached(savedAt < requestedAt - 5_000)
+      writeCachedForecast(target, payload as Forecast, savedAt)
     } catch (reason) {
       if (!(reason instanceof DOMException && reason.name === 'AbortError')) {
         setError(reason instanceof Error ? reason.message : 'Weather is unavailable right now.')
@@ -70,6 +78,10 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const cached = readCachedForecast(place)
+    setForecast(cached?.forecast ?? null)
+    setUpdatedAt(cached ? new Date(cached.savedAt) : null)
+    setIsCached(Boolean(cached))
     const controller = new AbortController()
     void loadForecast(place, controller.signal)
     return () => controller.abort()
@@ -86,7 +98,7 @@ export default function App() {
   }, [theme])
 
   const isSaved = useMemo(() => place.id === savedPlace.id, [place.id, savedPlace.id])
-  const updatedLabel = updatedAt ? relativeUpdate(updatedAt) : 'Updating weather…'
+  const updatedLabel = updatedAt ? relativeUpdate(updatedAt, isCached ? 'Cached' : 'Updated') : 'Updating weather…'
   void clock
 
   const saveCurrent = () => {
@@ -127,15 +139,18 @@ export default function App() {
           >
             {theme === 'light' ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}
           </button>
-          <button className="refresh" onClick={() => void loadForecast(place)} type="button">
-            <RefreshCw aria-hidden="true" />
+          <button aria-label={`${updatedLabel}. Refresh weather`} className="refresh" onClick={() => void loadForecast(place)} type="button">
+            <RefreshCw aria-hidden="true" className={loading ? 'is-loading' : ''} />
             <span>{updatedLabel}</span>
           </button>
         </header>
 
         {error && (
           <div className="error-panel" role="alert">
-            <div><strong>Couldn’t refresh the forecast.</strong><span>{error}</span></div>
+            <div>
+              <strong>{forecast ? 'Showing cached weather.' : 'Couldn’t load the forecast.'}</strong>
+              <span>{error}</span>
+            </div>
             <button onClick={() => void loadForecast(place)} type="button">Try again</button>
           </div>
         )}

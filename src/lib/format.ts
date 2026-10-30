@@ -17,10 +17,9 @@ export function dayName(date: string, long = false) {
   }).format(new Date(`${date}T12:00:00Z`))
 }
 
-export function relativeUpdate(timestamp: Date) {
+export function relativeUpdate(timestamp: Date, prefix = 'Updated') {
   const minutes = Math.max(0, Math.floor((Date.now() - timestamp.getTime()) / 60_000))
-  if (minutes < 1) return 'Updated just now'
-  if (minutes === 1) return 'Updated 1 min ago'
-  return `Updated ${minutes} min ago`
+  if (minutes < 1) return `${prefix} just now`
+  if (minutes === 1) return `${prefix} 1 min ago`
+  return `${prefix} ${minutes} min ago`
 }
-
