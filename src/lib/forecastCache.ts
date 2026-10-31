@@ -49,7 +49,13 @@ function isForecast(value: unknown): value is Forecast {
     && typeof current?.is_day === 'number'
     && isStringArray(hourly?.time)
     && isNumberArray(hourly?.temperature_2m)
-    && hourly?.time.length === hourly?.temperature_2m.length
+    && isNumberArray(hourly?.weather_code)
+    && isNumberArray(hourly?.is_day)
+    && [
+      hourly.temperature_2m,
+      hourly.weather_code,
+      hourly.is_day,
+    ].every((items) => items.length === hourly.time.length)
     && isStringArray(daily?.time)
     && daily.time.length > 0
     && isNumberArray(daily?.weather_code)

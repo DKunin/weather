@@ -27,6 +27,8 @@ export type Forecast = {
   hourly: {
     time: string[]
     temperature_2m: number[]
+    weather_code: number[]
+    is_day: number[]
   }
   hourly_units: Record<string, string>
   daily: {

@@ -23,12 +23,20 @@ export function ThreeDayForecast({ forecast, units }: ForecastsProps) {
               <span>{temperature(forecast.daily.temperature_2m_min[index], units)}</span>
             </div>
           </div>
-          <div className="forecast-dayparts" aria-label={`${dayName(date, true)} temperatures by time of day`}>
-            {dayparts.map(({ label, temperature: value }) => (
-              <span key={label}>
+          <div className="forecast-dayparts" aria-label={`${dayName(date, true)} weather and temperatures by time of day`}>
+            {dayparts.map(({ label, temperature: value, weatherCode, isDay }) => (
+              <div className="forecast-daypart" key={label}>
                 <small>{label}</small>
-                <strong>{value === null ? '—' : temperature(value, units)}</strong>
-              </span>
+                <div className="forecast-daypart-value">
+                  {weatherCode !== null && (
+                    <img
+                      alt={weatherLabel(weatherCode)}
+                      src={weatherIcon(weatherCode, isDay ?? true)}
+                    />
+                  )}
+                  <strong>{value === null ? '—' : temperature(value, units)}</strong>
+                </div>
+              </div>
             ))}
           </div>
           <div className="forecast-meta">

@@ -49,7 +49,11 @@ export function buildWeatherUrl(latitude, longitude) {
       'wind_direction_10m',
       'is_day',
     ].join(','),
-    hourly: 'temperature_2m',
+    hourly: [
+      'temperature_2m',
+      'weather_code',
+      'is_day',
+    ].join(','),
     daily: [
       'weather_code',
       'temperature_2m_max',

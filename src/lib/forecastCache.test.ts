@@ -27,7 +27,12 @@ const forecast = {
     is_day: 1,
   },
   current_units: {},
-  hourly: { time: ['2026-10-30T12:00'], temperature_2m: [12] },
+  hourly: {
+    time: ['2026-10-30T12:00'],
+    temperature_2m: [12],
+    weather_code: [2],
+    is_day: [1],
+  },
   hourly_units: {},
   daily: {
     time: ['2026-10-30'],
@@ -70,6 +75,21 @@ describe('forecast cache', () => {
     const storage = memoryStorage()
     storage.setItem('weather:forecast-cache:v1', JSON.stringify({
       '52.5200,13.4100': { savedAt: 1234, forecast: { timezone: 'Europe/Berlin' } },
+    }))
+
+    expect(readCachedForecast(place, storage)).toBeNull()
+  })
+
+  it('ignores forecasts cached before hourly conditions were added', () => {
+    const storage = memoryStorage()
+    storage.setItem('weather:forecast-cache:v1', JSON.stringify({
+      '52.5200,13.4100': {
+        savedAt: 1234,
+        forecast: {
+          ...forecast,
+          hourly: { time: ['2026-10-30T12:00'], temperature_2m: [12] },
+        },
+      },
     }))
 
     expect(readCachedForecast(place, storage)).toBeNull()

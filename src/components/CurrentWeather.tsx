@@ -84,12 +84,20 @@ export function CurrentWeather({ forecast, units }: CurrentWeatherProps) {
           </div>
         ))}
       </div>
-      <div className="dayparts" aria-label="Today's temperatures by time of day">
-        {dayparts.map(({ label, time, temperature: value }) => (
+      <div className="dayparts" aria-label="Today's weather and temperatures by time of day">
+        {dayparts.map(({ label, time, temperature: value, weatherCode, isDay }) => (
           <div className="daypart" key={label}>
-            <span>{label}</span>
+            <div className="daypart-copy">
+              <span>{label}</span>
+              <small>{time}</small>
+            </div>
+            {weatherCode !== null && (
+              <img
+                alt={weatherLabel(weatherCode)}
+                src={weatherIcon(weatherCode, isDay ?? true)}
+              />
+            )}
             <strong>{value === null ? '—' : temperature(value, units)}</strong>
-            <small>{time}</small>
           </div>
         ))}
       </div>

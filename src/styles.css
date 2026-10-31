@@ -145,11 +145,13 @@ button { color: inherit; }
 .metric span { color: #425a74; }
 .metric strong { font-size: 22px; }
 .dayparts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(74, 114, 149, 0.23); background: rgba(240, 249, 255, 0.68); backdrop-filter: blur(10px); }
-.daypart { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 1px 12px; padding: 13px 24px; border-left: 1px solid rgba(74, 114, 149, 0.2); }
+.daypart { display: grid; grid-template-columns: 1fr 42px auto; align-items: center; gap: 12px; padding: 10px 24px; border-left: 1px solid rgba(74, 114, 149, 0.2); }
 .daypart:first-child { border-left: 0; }
+.daypart-copy { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
 .daypart span { color: #425a74; font-size: 14px; font-weight: 650; }
 .daypart strong { font-size: 22px; letter-spacing: -0.025em; }
-.daypart small { grid-column: 1 / -1; color: #667d95; font-size: 11px; }
+.daypart small { color: #667d95; font-size: 11px; }
+.daypart img { width: 42px; height: 38px; object-fit: contain; }
 
 .forecast-section { margin-top: 22px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 13px; }
@@ -166,10 +168,12 @@ button { color: inherit; }
 .forecast-main strong { font-size: 36px; letter-spacing: -0.04em; }
 .forecast-main span { color: var(--muted); font-size: 22px; }
 .forecast-dayparts { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 -7px 14px; padding: 10px 0; border-block: 1px solid #e3ebf2; }
-.forecast-dayparts span { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 3px; border-left: 1px solid #e3ebf2; }
-.forecast-dayparts span:first-child { border-left: 0; }
+.forecast-daypart { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 3px; border-left: 1px solid #e3ebf2; }
+.forecast-daypart:first-child { border-left: 0; }
 .forecast-dayparts small { color: #61778f; font-size: 10px; font-weight: 650; }
 .forecast-dayparts strong { font-size: 17px; }
+.forecast-daypart-value { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.forecast-daypart-value img { width: 32px; height: 29px; object-fit: contain; }
 .forecast-meta { display: flex; justify-content: space-around; gap: 14px; color: #334d6d; }
 .forecast-meta span, .week-rain { display: inline-flex; align-items: center; gap: 8px; }
 .forecast-meta svg, .week-rain svg { width: 18px; color: #1573d4; fill: rgba(21, 115, 212, 0.13); }
@@ -240,7 +244,9 @@ footer a { color: inherit; }
   .metric span { order: 3; font-size: 10px; }
   .metric strong { font-size: 14px; }
   .dayparts { margin-inline: -8px; }
-  .daypart { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 3px; text-align: center; }
+  .daypart { grid-template-columns: 1fr auto; gap: 2px 4px; padding: 8px 3px; text-align: center; }
+  .daypart-copy { grid-column: 1 / -1; align-items: center; }
+  .daypart img { width: 32px; height: 29px; justify-self: end; }
   .daypart span { font-size: 11px; }
   .daypart strong { font-size: 17px; }
   .daypart small { font-size: 9px; }
@@ -367,7 +373,7 @@ html[data-theme='dark'] .current-metrics,
 html[data-theme='dark'] .dayparts,
 html[data-theme='dark'] .daypart,
 html[data-theme='dark'] .forecast-dayparts,
-html[data-theme='dark'] .forecast-dayparts span,
+html[data-theme='dark'] .forecast-daypart,
 html[data-theme='dark'] .forecast-meta,
 html[data-theme='dark'] .week-day {
   border-color: rgba(168, 198, 222, 0.22);

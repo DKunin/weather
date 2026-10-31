@@ -24,6 +24,8 @@ function getDayparts(
     return {
       ...daypart,
       temperature: index >= 0 ? forecast.hourly.temperature_2m[index] : null,
+      weatherCode: index >= 0 ? forecast.hourly.weather_code[index] : null,
+      isDay: index >= 0 ? forecast.hourly.is_day[index] === 1 : null,
     }
   })
 }
